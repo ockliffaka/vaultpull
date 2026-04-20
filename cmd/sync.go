@@ -32,6 +32,11 @@ var syncCmd = &cobra.Command{
 			return fmt.Errorf("reading secrets from vault: %w", err)
 		}
 
+		if len(secrets) == 0 {
+			log.Printf("no secrets found at path %s, nothing to write", cfg.SecretPath)
+			return nil
+		}
+
 		w := dotenv.NewWriter(cfg.OutputFile, overwrite)
 		if err := w.Write(secrets); err != nil {
 			return fmt.Errorf("writing .env file: %w", err)
