@@ -40,6 +40,16 @@ func TestMaskValue_ZeroShowChars(t *testing.T) {
 	}
 }
 
+// TestMaskValue_ExactBoundary checks that a value whose length equals ShowChars
+// is treated as short and returns the placeholder rather than a partial reveal.
+func TestMaskValue_ExactBoundary(t *testing.T) {
+	opts := DefaultMaskOptions() // ShowChars == 4
+	result := MaskValue("abcd", opts)
+	if result != opts.Placeholder {
+		t.Errorf("expected placeholder %q for value at exact boundary, got %q", opts.Placeholder, result)
+	}
+}
+
 func TestMaskMap_AllMasked(t *testing.T) {
 	secrets := map[string]string{
 		"DB_PASS": "s3cr3t",
