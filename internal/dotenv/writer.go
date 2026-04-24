@@ -10,7 +10,7 @@ import (
 
 // Writer writes key-value secrets to a .env file.
 type Writer struct {
-	filePath string
+	filePath  string
 	overwrite bool
 }
 
@@ -22,6 +22,7 @@ func NewWriter(filePath string, overwrite bool) *Writer {
 
 // Write serializes the provided secrets map into the .env file.
 // Existing keys are preserved unless overwrite is enabled.
+// If overwrite is false, existing keys in the file take precedence over new secrets.
 func (w *Writer) Write(secrets map[string]string) error {
 	existing := map[string]string{}
 
@@ -29,23 +30,26 @@ func (w *Writer) Write(secrets map[string]string) error {
 		existing = parse(string(data))
 	}
 
+	merged := make(map[string]string, len(secrets))
+	for k, v := range secrets {
+		merged[k] = v
+	}
+
 	if !w.overwrite {
 		for k, v := range existing {
-			if _, ok := secrets[k]; !ok {
-				secrets[k] = v
-			}
+			merged[k] = v
 		}
 	}
 
 	var sb strings.Builder
-	keys := make([]string, 0, len(secrets))
-	for k := range secrets {
+	keys := make([]string, 0, len(merged))
+	for k := range merged {
 		keys = append(keys, k)
 	}
 	sort.Strings(keys)
 
 	for _, k := range keys {
-		fmt.Fprintf(&sb, "%s=%s\n", k, secrets[k])
+		fmt.Fprintf(&sb, "%s=%s\n", k, merged[k])
 	}
 
 	return os.WriteFile(w.filePath, []byte(sb.String()), 0600)
