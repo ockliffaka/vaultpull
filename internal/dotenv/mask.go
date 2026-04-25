@@ -62,3 +62,17 @@ func MaskSummary(original, masked map[string]string) string {
 	}
 	return fmt.Sprintf("%d of %d value(s) masked", count, len(original))
 }
+
+// IsMasked reports whether a value appears to have been masked using the given options.
+// It checks whether the value ends with the placeholder and the visible prefix is
+// shorter than or equal to ShowChars, or whether the value equals the placeholder entirely.
+func IsMasked(value string, opts MaskOptions) bool {
+	if value == opts.Placeholder {
+		return true
+	}
+	if opts.ShowChars > 0 && strings.HasSuffix(value, opts.Placeholder) {
+		prefix := strings.TrimSuffix(value, opts.Placeholder)
+		return len(prefix) <= opts.ShowChars
+	}
+	return false
+}
