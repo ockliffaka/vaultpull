@@ -46,7 +46,8 @@ func TestMerge_OverwriteUpdatesConflicts(t *testing.T) {
 		t.Fatalf("unexpected error: %v", err)
 	}
 	if res.Updated != 1 {
-		t.Errorf("expected 1 updated, got %+}
+		t.Errorf("expected 1 updated, got %+v", res)
+	}
 
 	data, _ := os.ReadFile(f)
 	parsed := parse(string(data))
